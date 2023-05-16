@@ -1,0 +1,4 @@
+deb https://binary.alfabank.ru/artifactory/debian/ bullseye main contrib non-free
+deb-src https://binary.alfabank.ru/artifactory/debian/ bullseye main contrib non-free
+deb https://binary.alfabank.ru/artifactory/debian-security/ bullseye-security main contrib non-free
+deb-src https://binary.alfabank.ru/artifactory/debian-security/ bullseye-security main contrib non-free

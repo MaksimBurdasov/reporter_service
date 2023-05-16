@@ -1,0 +1,166 @@
+Задача: https://jira.moscow.alfaintra.net/browse/OSSKTB-1521
+Папка для выгрузки: \\bpdb1\shar_all\Отчёты ReporterService
+Jankins: http://ossktbapp1:8080/view/rcsite-service/job/build-ossktb-rcsite-reporter-service/
+Method: 'ossktb-rcsite-reporter-service/sendReport/'
+Проект Полины: https://git.moscow.alfaintra.net/projects/OSSKTB/repos/ossktb-rcsite-gen-python-service/browse
+Серия статей про Docker: https://habr.com/ru/company/ruvds/blog/438796/
+Видео Docker | How to Dockerize a Django application (Beginners Guide): https://www.youtube.com/watch?v=W5Ov0H7E_o4
+Dockerize a Python django App in 3 minutes: https://dockerize.io/guides/python-django-guide
+Best practices for writing Dockerfiles: https://docs.docker.com/develop/develop-images/dockerfile_best-practices/
+Dockerfile reference: https://docs.docker.com/engine/reference/builder/#volume
+Dockerfile лучшие практики: https://habr.com/ru/company/wunderfund/blog/586778/
+Видео по настройкк аутентификации DRF: https://youtu.be/Wq6JqXqOzCE
+Библиотека для настройки логирования из Django в БД: https://pypi.org/project/django-db-logger/
+Инструкция по использованию команды OFFSET-FETCH:
+    https://stackoverflow.com/questions/603724/how-to-implement-limit-with-sql-server
+    https://learn.microsoft.com/en-us/previous-versions/sql/compact/sql-server-compact-4.0/gg699618(v=sql.110)?redirectedfrom=MSDN
+Статья по использованию чанков для оптимизации выгрузки: https://pythonspeed.com/articles/pandas-sql-chunking/
+
+
+Команда мантирования: mount -t cifs -v //bpdb1/shar_all/ReporterDepot /mnt/ReporterDepot -o username=OSSKTBAdmin,password='OSSKTBPass1234',domain=moscow.alfaintra.net,vers=2.0,iocharset=utf8,cache=loose,noperm
+
+Подключиться к серверу OSSKTBAPP:
+    ssh u_m1gt7@ossktbapprhel1
+Переключиться на рута:
+    sudo -s
+Посмотреть сборки докер:
+    docker images
+Удалить сборки докер:
+    docker rmi -f <IMAGE ID сборки A>, <IMAGE ID сборки B>, ...
+
+Подключение к докер-контейнеру:
+    найти хэш так:
+        sudo docker ps
+    и подставить его в:
+        sudo docker exec -it mesos-8394751a-9b2a-45fe-97ca-ac7b030c32a9 sh
+
+
+Предельный размер отправки файла почтой: 20 MB
+
+
+задачи:
++ реализовать метод get для получения папок с отчётами
++ реализовать метод get для получения скриптов из папки
+
++ Создание представлений (файл views.py) и прокладки маршрута (файл urls.py)
+    Подробнее про названия методов и параметры смотреть в задаче на Jira или в файле API_checklist.txt
+
++ Составить список всех потенциально нужных параметров
++ Cделать обработку дополнительных
+
++ Создать дефолтную сетевую папку для выгрузки
+    готово: "\\bpdb1\shar_all\Отчёты ReporterService"
+
++ Добавить формат csv
+    + разобраться с кодировкой (сейчас формируется отчёт с кракозябрами)
+    + добавить необязательные параметр format: xlsx / csv (формат файла с отчётом)
+    + дополнить функцию-формировщик отчёта
++ На почту или в сетевую папку в зависимости от объёма
+    + сделать проверку памяти
+        + проверять на этапе записи датафрейма в байт-объект
+        + создать шаблон письма "передача жирных отчётов почтой недоступна, файл выложен в шару"
+    + сделать проверку кол-ва строк
+        + проверять кол-во строк в датафрейме
+        + подготовить шаблон письма
+        + отправлять письмо об изменении формата на csv
+    + сделать сохранение файла в папку
+
++ Подготовить справочную таблицу с серверами, на которых можно выполнять отчёты
++ Написать метод getDBServers
++ Сделать классы собственных ошибок для их отлова в функции magic_away_from_Hogwarts
+    + создать ошибки
+    + запускать их из функций
+    + если возникла ошабка, то возвращать её в дополнительном параметре ответа
+
++ ответы на методы
+    + getFolders,
+    + getQueries
+должны содержать описание папок и файлов
++ добавить поле error_message
+
++ исправить ошибку pyodbc.OperationalError: ('08001', '[08001] [Microsoft][ODBC Driver 17 for SQL Server]TCP Provider: Error code 0x2746 (10054) (SQLDriverConnect)')
+    > https://github.com/microsoft/mssql-docker/issues/636
+        > https://support.microsoft.com/en-us/topic/kb4548001-fix-connection-error-occurs-when-you-try-to-connect-sql-server-2017-on-linux-by-using-openssl-1-1-a2eca71a-a412-3281-dbf8-fe933dba26e7
+    << решение - нужно было:
+        1) добавить openssl.cnf файл к проекту
+        2) в Dockerfile прописат строку:
+            COPY /openssl.cnf ./etc/ssl/openssl.cnf
+
++ смонтировать папку в контейнер (для выгрузки отчётов в шару)
+    + зашить в сеттинги логин и пароль от тех. учётки ОС
+    + добавить код
+    + указать в Dockerfile копирование файла sources.list в  /etc/apt/sources.list
+    + исправить ошибку
+
++ ИЗЫСКАНИЯ "Как примонтировать папку":
+    + про протоколы CIFS и SMB: https://hackware.ru/?p=10923
+    - не уверен, что по теме, но
+        - статья про Bind mounts: https://docs.docker.com/storage/bind-mounts/
+        - статья про Volumes (тома): https://docs.docker.com/storage/volumes/
+
++ доработка: добавить редактирование sql-запросов в UI
+    + создать метод для получения sql\
+    + добавить параметр СКРИТП (должен быть в формате text) в magic_away_from_Hogwarts
+    + брать в работу sql из формы по умолчнию
+
++ авторизация по токену
+    + создавать юзера по готовому классу юзер в customauth.py
+    + переписать ExternalJWTAuthentication
+    + аут по токену
+    + получение
+    + по умолчанию добавлять в копию сотрудника
+
++ перенести секретный ключ из настроект в сервис
+
++ сделать логирование
+    + определить:
+        + как и где инициализировать логер
+        + как записывать логи в файл
+        + как и когда менять уровень логера
+    + дописать словарь настроек логирования
+        + проверить логирование в файл
+    + написать класс хендлера для записи в базу
+    + создать таблицу для логов моих сервисов в нашей БД:
+        + определить набор полей для логирования
+        + выяснить причину ошибки
+            cursor.execute(sql_query, LOG_TABLE, level, logger_name, log_message, error_traceback)
+pyodbc.ProgrammingError: ('42000', '[42000] [Microsoft][ODBC SQL Server Driver][SQL Server]Must declare the table variable "@P1". (1087) (SQLExecDirectW); [42000] [Microsoft][ODBC SQL Serv
+er Driver][SQL Server]Statement(s) could not be prepared. (8180)')
+[11/Apr/2023 18:17:02] "GET /health HTTP/1.1" 500 59
+
+        - создать таблицу и подготовить по ней статью с подборкой скриптов
+    + изменить хранилище логов на таблицу
+
++ поправить шаблоны писем
++ избавиться от всех TODO отметок
+
+
++ проверить качество логирования в csv-файл
+    (не потребовалось) исправить при необходимости
++ исправить измерение размера датафрейма
+    + в тектсте кода
+    + в тексте логов
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+Выяснилось, что контейнер ложиться в двух случаях:
+    1) Запрос возвращает слишком много объектов в датафрейм (если датафрейм весит более 300 МБ - хана)
+    2) Записывается слишком большой по размеру файл
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
++ протестировать загрузку по частям
+    + написать функцию дозаписи датафрейма в файл
+    + замерить загрузку чанками по 250к строк
+
++ правильно настроить выбор текста письма
+    + собирать текст по кускам
+    + добавить название отчёта в отправляемое письмо
+    + написать в шаблоне про кодировку UTF-8
+
+
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Несбывшиеся мечты:
+<tt><i>Сформировано автоматически сервисом <b>RC Site Reporter</b>. Отвечать не нужно.</i></tt>
+
+
+ALL_Close_accounts_report_Bezdenezhnyh_230515.xlsx

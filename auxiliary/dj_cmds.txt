@@ -1,0 +1,27 @@
+Создание проекта:
+    django-admin startproject rcsite_reporter
+    cd rcsite_reporter
+
+Создание приложения:
+    py manage.py startapp report_app
+
+В файле settings подключить новое приложение:
+    INSTALLED_APPS = [
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+--->'report_app.apps.ReportAppConfig',
+]
+
+Проведение миграций:
+    python manage.py migrate
+
+Создать администратора сайта:
+    py manage.py createsuperuser
+
+Запуск сервера:
+    py manage.py runserver
+

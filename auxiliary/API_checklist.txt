@@ -1,0 +1,30 @@
+1 - Создать проект
+
+2 - Создать приложение и добавить его в список INSTALLED_APPS
+    Шаблон: '<название_приложения>.apps.<название_класса_настроек_приложения_из_файла_apps>'
+    Пример: 'greenapp.apps.GreenappConfig'
+
+??? 3 - Создать модель в файле model.py (он находится в папке приложения)
+
+??? 4 - Создать миграции и выполнить их
+        а) python manage.py makemigrations
+        б) python manage.py migrate
+
+3 - Создать суперпользовтеля
+    py manage.py createsuperuser
+
+4 - Скачать Django Rest Framework
+    pip install djangorestframework
+
+5 - Добавить rest_framework к приложениям
+    INSTALLED_APPS = [
+        ...
+        'rest_framework',
+    ]
+
+??? 6 - Создать серриализатор
+    Создать файл serializers.py в папке приложения
+
+
+7 - Связать определёные маршруты из файла urls.py с представлениями из файла views.py
+    В файле url.py связать маршруты в списке urlpatterns

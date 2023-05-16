@@ -1,0 +1,90 @@
+{
+  "id": "/ossktb-rcsite/middle/reporter-service",
+  "cmd": null,
+  "cpus": 0.1,
+  "mem": 1024,
+  "disk": 0,
+  "instances": 1,
+  "constraints": [
+    [
+      "hostname",
+      "GROUP_BY",
+      "1"
+    ],
+    [
+      "hostname",
+      "LIKE",
+      "(ossktbapprhel1)"
+    ]
+  ],
+  "acceptedResourceRoles": [
+    "*"
+  ],
+  "container": {
+    "type": "DOCKER",
+    "docker": {
+      "forcePullImage": false,
+      "image": "REPLACE_IMAGE",
+      "parameters": [
+        {
+          "key": "memory",
+          "value": "1024m"
+        },
+        {
+          "key": "memory-swap",
+          "value": "1088m"
+        }
+      ],
+      "privileged": true
+    },
+    "volumes": [
+      {
+        "containerPath": "/rcsite_reporter/CAs.pem",
+        "hostPath": "/data/ssl/CAs/combinedCA.pem",
+        "mode": "RO"
+      }
+    ],
+    "portMappings": [
+      {
+        "containerPort": 8080,
+        "hostPort": 0,
+        "labels": {},
+        "protocol": "tcp",
+        "servicePort": 11000
+      }
+    ]
+  },
+  "healthChecks": [
+    {
+      "gracePeriodSeconds": 300,
+      "intervalSeconds": 10,
+      "maxConsecutiveFailures": 3,
+      "path": "/health",
+      "portIndex": 0,
+      "protocol": "MESOS_HTTP",
+      "ipProtocol": "IPv4",
+      "timeoutSeconds": 20,
+      "delaySeconds": 15
+    }
+  ],
+  "labels": {
+    "HAPROXY_GROUP": "ossktb",
+    "HAPROXY_0_HTTP_BACKEND_PROXYPASS_PATH": "/ossktb-rcsite-reporter-service",
+    "HAPROXY_0_PATH": "-i /ossktb-rcsite-reporter-service",
+    "HAPROXY_0_HTTP_BACKEND_PROXYPASS_GLUE": "  reqirep  \"^([^ :]*)\\ {proxypath}/?(.*)\" \"\\1\\ /\\2\"\n",
+    "HAPROXY_0_VHOST": "ossktbapprhel1,"
+  },
+  "networks": [
+    {
+      "mode": "container/bridge"
+    }
+  ],
+  "portDefinitions": [],
+  "backoffFactor": 2,
+  "backoffSeconds": 30,
+  "maxLaunchDelaySeconds": 86400,
+  "upgradeStrategy": {
+    "maximumOverCapacity": 1,
+    "minimumHealthCapacity": 0.5
+  }
+}

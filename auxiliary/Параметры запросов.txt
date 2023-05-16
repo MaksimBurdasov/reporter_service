@@ -1,0 +1,39 @@
+Запросы в UI (которые надо бахнуть)
+getDBServers: {
+    url: `http://ossktbapprhel1/ossktb-rcsite-reporter-service/getDBServer`,
+    method: 'GET',
+    path: '/getDBServer',
+},
+getFolders: {
+    url: `http://ossktbapprhel1/ossktb-rcsite-reporter-service/getFolders`,
+    method: 'GET',
+    path: '/getFolders',
+},
+getQueries: {
+    url: `http://ossktbapprhel1/ossktb-rcsite-reporter-service/getQueries`,
+    method: 'GET',
+    path: '/getQueries',
+},
+sendReport: {
+    url: `http://ossktbapprhel1/ossktb-rcsite-reporter-service/sendReport`,
+    method: 'POST',
+    path: '/sendReport',
+},
+
+
+Жду ответы на них
+	getDBServer (Жду Массив элементов)
+		    server: string;
+			name: string;
+	getFolders (Жду массив элементов)
+			description: string;
+			name: string;
+	getQueries (Передаю параметр ?foldes=) -> (Жду массив элементов)
+			description: string;
+			name: string;
+	sendReport (Подумать надо ли передавать ЦСВ или нет, выгружать на шару или на почту отправка?)
+		Передаю тело
+			queries: string;
+			db: string;
+			mail: string;
+		Жду код 200 (ОК не ОК). Если ошибка, то отправлять код 400/500 с телом errorMessage
